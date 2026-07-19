@@ -1,0 +1,41 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/*.tsbuildinfo
+
+# Local data - NEVER commit experiment data or secrets
+data/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite-journal
+.env
+.env.local
+secrets/
+private_keys/
+*.pem
+*.key
+id_rsa*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# AI/tool config
+.claude/
+.codex/
