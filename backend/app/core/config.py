@@ -29,10 +29,9 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
-
 
 DEFAULT_DATA_DIR = Path(os.environ.get("DIRTYLAB_DATA_DIR", "./data")).resolve()
 
@@ -62,7 +61,7 @@ class AppConfig:
     http_timeout_seconds: float = 60.0
 
     @classmethod
-    def load(cls, data_dir: Path | None = None) -> "AppConfig":
+    def load(cls, data_dir: Path | None = None) -> AppConfig:
         root = (data_dir or DEFAULT_DATA_DIR).resolve()
         root.mkdir(parents=True, exist_ok=True)
         (root / "secrets").mkdir(exist_ok=True)

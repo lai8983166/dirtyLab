@@ -17,7 +17,6 @@ from sqlalchemy.orm import Session
 from app.models import Artifact
 from app.services import experiment_repo
 
-
 KNOWN_FIELDS = ["prompt", "workflow", "model", "seed", "steps", "sampler", "cfg"]
 
 

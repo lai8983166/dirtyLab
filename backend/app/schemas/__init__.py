@@ -6,7 +6,6 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
-
 # ----- generic -----
 
 
@@ -98,9 +97,9 @@ class ExperimentCreate(BaseModel):
 
 
 class ExperimentDetail(ExperimentOut):
-    snapshots: list["SnapshotOut"] = Field(default_factory=list)
-    evaluations: list["EvaluationOut"] = Field(default_factory=list)
-    analyses: list["AnalysisOut"] = Field(default_factory=list)
+    snapshots: list[SnapshotOut] = Field(default_factory=list)
+    evaluations: list[EvaluationOut] = Field(default_factory=list)
+    analyses: list[AnalysisOut] = Field(default_factory=list)
 
 
 # ----- snapshot / artifact -----

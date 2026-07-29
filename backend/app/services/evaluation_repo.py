@@ -14,7 +14,6 @@ from app.models import (
 )
 from app.services.template_repo import get_active_template
 
-
 VALID_STATUSES = {"success", "partial_success", "failure"}
 VALID_PROVENANCE = {"human", "ai_confirmed", "ai_edited"}
 
@@ -24,6 +23,10 @@ def get_evaluation(db: Session, evaluation_id: str) -> Evaluation:
     if obj is None:
         raise NotFoundError("Evaluation not found", details={"id": evaluation_id})
     return obj
+
+
+def get_evaluation_for_artifact(db: Session, artifact_id: str) -> Evaluation | None:
+    return db.scalar(select(Evaluation).where(Evaluation.artifact_id == artifact_id))
 
 
 def upsert_evaluation(
@@ -76,10 +79,10 @@ def upsert_evaluation(
 
     # Wipe + reinsert dimension/tag scores for simplicity.
     if existing is not None:
-        for child in list(existing.dimension_scores):
-            db.delete(child)
-        for child in list(existing.tags):
-            db.delete(child)
+        for ds in list(existing.dimension_scores):
+            db.delete(ds)
+        for tag in list(existing.tags):
+            db.delete(tag)
     db.flush()
 
     for d in dimension_scores or []:

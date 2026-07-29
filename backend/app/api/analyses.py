@@ -4,13 +4,12 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.core.errors import NotFoundError, ValidationError
+from app.core.errors import ValidationError
 from app.db.base import get_db
 from app.schemas import AnalysisConfirmIn, AnalysisOut, AnalysisRequestIn
 from app.schemas.repositories import analysis_to_schema
 from app.services import analysis_repo, connection_repo, experiment_repo
 from app.services import multimodal as multimodal_service
-
 
 router = APIRouter()
 

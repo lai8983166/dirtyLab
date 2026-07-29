@@ -9,7 +9,6 @@ from app.db.base import get_db
 from app.services import connection_repo, experiment_repo
 from app.services import sync as sync_service
 
-
 router = APIRouter()
 
 

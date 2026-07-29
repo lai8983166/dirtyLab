@@ -8,7 +8,6 @@ We can't exercise real SSH in unit tests, so we cover the in-process paths:
 """
 from __future__ import annotations
 
-import io
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -16,7 +15,7 @@ from fastapi.testclient import TestClient
 from app.core.config import AppConfig
 from app.db.base import session_scope
 from app.models import Connection
-from app.services import connection_repo, secrets
+from app.services import connection_repo
 from app.services.connection_test import check_connection
 from app.services.ssh_keys import validate_private_key
 
@@ -112,7 +111,8 @@ def test_connection_test_reports_missing_key(tmp_data_dir: Path) -> None:
     result = check_connection(cfg, conn)
     assert not result.ok
     assert result.stage == "ssh_access"
-    assert "missing" in (result.detail or "").lower() or "private key" in (result.detail or "").lower()
+    detail = (result.detail or "").lower()
+    assert "missing" in detail or "private key" in detail
 
 
 def test_connection_test_reports_no_config(client: TestClient) -> None:
@@ -124,7 +124,9 @@ def test_connection_test_reports_no_config(client: TestClient) -> None:
     assert "No connection" in body["detail"]
 
 
-def test_save_connection_endpoint_stores_key_as_secret(client: TestClient, tmp_data_dir: Path) -> None:
+def test_save_connection_endpoint_stores_key_as_secret(
+    client: TestClient, tmp_data_dir: Path
+) -> None:
     key_text = paramiko_key()
     response = client.put(
         "/api/connections",

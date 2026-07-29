@@ -18,7 +18,6 @@ from unittest.mock import patch
 from fastapi.testclient import TestClient
 
 from app.core.config import AppConfig
-from app.db.base import session_scope
 from app.providers import AnalysisResult
 from app.tests._fixtures import PNG_1x1_RED as PNG
 from app.tests.sftp_fixture import install_fake_sftp

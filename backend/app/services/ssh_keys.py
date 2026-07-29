@@ -30,7 +30,7 @@ def validate_private_key(key_text: str, *, file_path: Path | None = None) -> Key
     errors: list[str] = []
     loaders = [paramiko.Ed25519Key, paramiko.ECDSAKey, paramiko.RSAKey]
     if hasattr(paramiko, "DSSKey"):  # removed in paramiko 5+
-        loaders.append(getattr(paramiko, "DSSKey"))
+        loaders.append(paramiko.DSSKey)
     for loader in loaders:
         try:
             pkey = loader.from_private_key(io.StringIO(key_text))  # type: ignore[attr-defined]
@@ -38,11 +38,11 @@ def validate_private_key(key_text: str, *, file_path: Path | None = None) -> Key
         except (paramiko.SSHException, EOFError, ValueError) as exc:
             errors.append(str(exc))
     if pkey is None:
-        return KeyValidation(
-            ok=False,
-            detail="The provided private key could not be parsed. Use an OpenSSH-format Ed25519, ECDSA, or RSA key. "
-            + (" ".join(errors) if errors else ""),
+        detail = (
+            "The provided private key could not be parsed. Use an OpenSSH-format "
+            "Ed25519, ECDSA, or RSA key. " + (" ".join(errors) if errors else "")
         )
+        return KeyValidation(ok=False, detail=detail)
     warning = None
     if file_path is not None and file_path.exists():
         mode = file_path.stat().st_mode & 0o777

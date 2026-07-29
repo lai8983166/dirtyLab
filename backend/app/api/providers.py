@@ -10,7 +10,6 @@ from app.schemas import ProviderIn, ProviderOut
 from app.schemas.repositories import provider_to_schema
 from app.services import connection_repo, secrets
 
-
 router = APIRouter()
 
 

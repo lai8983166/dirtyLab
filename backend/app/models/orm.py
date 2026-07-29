@@ -19,25 +19,23 @@ Layout mirrors the data model in
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from sqlalchemy import (
     Boolean,
     DateTime,
-    Float,
     ForeignKey,
     Integer,
     String,
     Text,
     UniqueConstraint,
-    func,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _uuid() -> str:
@@ -104,7 +102,7 @@ class Experiment(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow)
 
-    snapshots: Mapped[list["Snapshot"]] = relationship(
+    snapshots: Mapped[list[Snapshot]] = relationship(
         back_populates="experiment", cascade="all, delete-orphan", order_by="Snapshot.created_at"
     )
 
@@ -124,7 +122,7 @@ class Snapshot(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     experiment: Mapped[Experiment] = relationship(back_populates="snapshots")
-    artifacts: Mapped[list["Artifact"]] = relationship(
+    artifacts: Mapped[list[Artifact]] = relationship(
         back_populates="snapshot", cascade="all, delete-orphan"
     )
 
@@ -147,7 +145,7 @@ class Artifact(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     snapshot: Mapped[Snapshot] = relationship(back_populates="artifacts")
-    extracted_metadata: Mapped[list["ExtractedMetadata"]] = relationship(
+    extracted_metadata: Mapped[list[ExtractedMetadata]] = relationship(
         back_populates="artifact", cascade="all, delete-orphan"
     )
 
@@ -182,12 +180,12 @@ class ScoringTemplate(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
-    dimensions: Mapped[list["QualityDimension"]] = relationship(
+    dimensions: Mapped[list[QualityDimension]] = relationship(
         back_populates="template",
         cascade="all, delete-orphan",
         order_by="QualityDimension.order_index",
     )
-    tags: Mapped[list["FailureTag"]] = relationship(
+    tags: Mapped[list[FailureTag]] = relationship(
         back_populates="template",
         cascade="all, delete-orphan",
         order_by="FailureTag.order_index",
@@ -245,10 +243,10 @@ class Evaluation(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow)
 
-    dimension_scores: Mapped[list["EvaluationDimensionScore"]] = relationship(
+    dimension_scores: Mapped[list[EvaluationDimensionScore]] = relationship(
         back_populates="evaluation", cascade="all, delete-orphan"
     )
-    tags: Mapped[list["EvaluationTag"]] = relationship(
+    tags: Mapped[list[EvaluationTag]] = relationship(
         back_populates="evaluation", cascade="all, delete-orphan"
     )
 
@@ -303,7 +301,7 @@ class Analysis(Base):
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     confirmed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
-    candidates: Mapped[list["AnalysisCandidate"]] = relationship(
+    candidates: Mapped[list[AnalysisCandidate]] = relationship(
         back_populates="analysis", cascade="all, delete-orphan"
     )
 

@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.errors import NotFoundError
-from app.models import Analysis, AnalysisCandidate, Artifact, Snapshot
+from app.models import Analysis, AnalysisCandidate
 
 
 def get_analysis(db: Session, analysis_id: str) -> Analysis:

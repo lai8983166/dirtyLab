@@ -34,6 +34,7 @@ def _ssh_client(config: AppConfig, conn: Connection) -> paramiko.SSHClient:
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     key_bytes = secrets.read_secret(config, conn.private_key_ref)
+    pkey: paramiko.PKey
     try:
         pkey = paramiko.Ed25519Key.from_private_key(io.StringIO(key_bytes.decode("utf-8")))  # type: ignore[arg-type]
     except paramiko.SSHException:
@@ -82,7 +83,7 @@ def check_connection(config: AppConfig, conn: Connection) -> ConnectionTestResul
             stage="ssh_access",
             detail=f"Host could not be resolved (network/DNS): {exc}",
         )
-    except (socket.timeout, TimeoutError) as exc:
+    except TimeoutError as exc:
         log.info("ssh.timeout", host=conn.host)
         return ConnectionTestResult(
             ok=False,
@@ -114,7 +115,7 @@ def check_connection(config: AppConfig, conn: Connection) -> ConnectionTestResul
         try:
             # Stage 2: remote_root exists and is accessible.
             try:
-                stat = sftp.stat(conn.remote_root)
+                sftp.stat(conn.remote_root)
                 resolved_paths["remote_root"] = conn.remote_root
             except FileNotFoundError:
                 return ConnectionTestResult(

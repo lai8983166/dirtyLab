@@ -5,8 +5,6 @@ we generate the keypair with ``cryptography`` and serialize it in OpenSSH form.
 """
 from __future__ import annotations
 
-import io
-
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 

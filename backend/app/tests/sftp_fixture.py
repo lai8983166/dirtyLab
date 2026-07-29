@@ -10,8 +10,6 @@ derive the directory structure from the path components.
 """
 from __future__ import annotations
 
-import io
-import os
 import time
 from dataclasses import dataclass
 from pathlib import PurePosixPath

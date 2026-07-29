@@ -200,6 +200,7 @@ def _build_prompt(context: AnalysisContext) -> str:
     else:
         lines.append("One candidate image is attached.")
     lines.append(
-        "Respond with JSON only: keys failure_causes, quality_scores, overall_score, status, next_steps."
+        "Respond with JSON only: keys failure_causes, quality_scores, "
+        "overall_score, status, next_steps."
     )
     return "\n".join(lines)

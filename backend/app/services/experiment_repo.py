@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from pathlib import PurePosixPath
-from typing import Iterable
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -158,7 +157,11 @@ def add_artifact(
 
 def list_snapshot_artifacts(db: Session, snapshot_id: str) -> list[Artifact]:
     return list(
-        db.scalars(select(Artifact).where(Artifact.snapshot_id == snapshot_id).order_by(Artifact.kind, Artifact.relative_path))
+        db.scalars(
+            select(Artifact)
+            .where(Artifact.snapshot_id == snapshot_id)
+            .order_by(Artifact.kind, Artifact.relative_path)
+        )
     )
 
 

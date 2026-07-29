@@ -12,9 +12,6 @@ Implements the spec for ``autodl-comfyui-sync``:
 from __future__ import annotations
 
 import io
-import json
-import os
-import socket
 import time
 from dataclasses import dataclass
 from pathlib import PurePosixPath
@@ -74,14 +71,14 @@ class _RemoteFile:
     mtime: float
 
 
-def run_sync(db: "Session", experiment: "Experiment", connection: "Connection") -> SyncResultOut:
+def run_sync(db: Session, experiment: Experiment, connection: Connection) -> SyncResultOut:
     log = get_logger("sync")
     cfg = AppConfig.load()
 
     # Stage 1: SSH connect.
     try:
         client = _ssh_client(cfg, connection)
-    except (socket.timeout, TimeoutError) as exc:
+    except TimeoutError as exc:
         log.info("sync.timeout", experiment_id=experiment.id)
         return _failure_snapshot(
             db,
@@ -134,7 +131,7 @@ def run_sync(db: "Session", experiment: "Experiment", connection: "Connection") 
             for f in files:
                 try:
                     data, checksum = _download_stable(sftp, f, cfg)
-                except _UnstableFile:
+                except _UnstableFileError:
                     partial_failures.append({"path": f.relative_path, "reason": "unstable"})
                     unstable_files = True
                     artifact = experiment_repo.add_artifact(
@@ -261,23 +258,23 @@ def _is_excluded(name: str) -> bool:
     return any(fnmatch(name, pat) for pat in EXCLUDE_PATTERNS)
 
 
-class _UnstableFile(Exception):
+class _UnstableFileError(Exception):
     pass
 
 
 def _download_stable(
-    sftp: paramiko.SFTPClient, f: "_RemoteFile", cfg: AppConfig
+    sftp: paramiko.SFTPClient, f: _RemoteFile, cfg: AppConfig
 ) -> tuple[bytes, str]:
     """Read the file size multiple times; if it keeps changing, raise."""
     import hashlib
 
-    last_size = -1
+    last_size: int | None = -1
     stable = False
     for _ in range(max(1, cfg.sync_stability_retries)):
         try:
             stat = sftp.stat(f.path)
         except FileNotFoundError as exc:
-            raise _UnstableFile() from exc
+            raise _UnstableFileError() from exc
         if stat.st_size != last_size and last_size != -1:
             time.sleep(cfg.sync_stability_wait_seconds)
             last_size = stat.st_size
@@ -295,9 +292,9 @@ def _download_stable(
             if stat.st_size == last_size:
                 stable = True
         except FileNotFoundError as exc:  # pragma: no cover
-            raise _UnstableFile() from exc
+            raise _UnstableFileError() from exc
     if not stable:
-        raise _UnstableFile()
+        raise _UnstableFileError()
     buf = io.BytesIO()
     sftp.getfo(f.path, buf)
     data = buf.getvalue()
@@ -305,7 +302,7 @@ def _download_stable(
 
 
 def _failure_snapshot(
-    db: "Session", experiment: "Experiment", *, source_path: str, detail: str
+    db: Session, experiment: Experiment, *, source_path: str, detail: str
 ) -> SyncResultOut:
     snapshot = experiment_repo.create_snapshot(
         db,
@@ -326,7 +323,7 @@ def _failure_snapshot(
 
 
 def _empty_snapshot(
-    db: "Session", experiment: "Experiment", *, source_path: str, ignored_count: int
+    db: Session, experiment: Experiment, *, source_path: str, ignored_count: int
 ) -> SyncResultOut:
     snapshot = experiment_repo.create_snapshot(
         db,

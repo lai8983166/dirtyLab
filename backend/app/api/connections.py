@@ -14,7 +14,6 @@ from app.schemas.repositories import connection_to_schema
 from app.services import connection_repo, secrets
 from app.services.connection_test import check_connection
 
-
 router = APIRouter()
 
 

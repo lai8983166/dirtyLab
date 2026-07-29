@@ -16,7 +16,6 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import AppConfig
 
-
 _engine: Engine | None = None
 _SessionLocal: sessionmaker[Session] | None = None
 

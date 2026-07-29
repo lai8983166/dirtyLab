@@ -1,8 +1,9 @@
 """Shared binary fixtures for tests."""
 from __future__ import annotations
 
-from PIL import Image
 import io
+
+from PIL import Image
 
 
 def make_png(color: tuple[int, int, int] = (255, 0, 0)) -> bytes:

@@ -24,11 +24,11 @@ if TYPE_CHECKING:
 
 
 def request_analysis(
-    db: "Session",
+    db: Session,
     *,
-    experiment: "Experiment",
-    provider: "Provider",
-    artifacts: list["Artifact"],
+    experiment: Experiment,
+    provider: Provider,
+    artifacts: list[Artifact],
     goal_override: str | None,
     include_comparison_context: bool,
 ) -> Analysis:
@@ -41,7 +41,8 @@ def request_analysis(
     metadata_summary: dict[str, str] = {}
     for artifact in artifacts:
         for m in artifact.extracted_metadata:
-            metadata_summary.setdefault(m.field_name, m.field_value if not m.is_unknown else "<unknown>")
+            value = "<unknown>" if m.is_unknown else m.field_value
+            metadata_summary.setdefault(m.field_name, value)
     workflow_json = None
     for artifact in artifacts:
         if artifact.kind == "workflow_json":
@@ -109,7 +110,7 @@ def request_analysis(
     )
 
 
-def confirm_analysis(db: "Session", analysis: Analysis, payload: dict) -> Analysis:
+def confirm_analysis(db: Session, analysis: Analysis, payload: dict) -> Analysis:
     """Apply user confirm/reject. Spec: distinguish confirmed user decisions
     from unconfirmed model output."""
     rejected_fields = list(payload.get("rejected_fields") or [])

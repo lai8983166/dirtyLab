@@ -19,7 +19,6 @@ from app.models import (
     ScoringTemplate,
 )
 
-
 DEFAULT_DIMENSIONS = [
     ("overall_alignment", "Overall alignment with goal"),
     ("artifact_quality", "Artifact / detail quality"),

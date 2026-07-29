@@ -7,7 +7,6 @@ real network or SSH is used.
 from __future__ import annotations
 
 import importlib
-import os
 import sys
 from collections.abc import Iterator
 from pathlib import Path

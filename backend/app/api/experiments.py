@@ -14,16 +14,15 @@ from sqlalchemy.orm import Session
 from app.core.config import get_config
 from app.core.errors import NotFoundError, ValidationError
 from app.db.base import get_db
-from app.schemas import ExperimentCreate, ExperimentDetail, ExperimentOut
+from app.schemas import ExperimentDetail, ExperimentOut
 from app.schemas.repositories import experiment_detail_schema, experiment_to_schema
-from app.services import artifacts as artifact_store_mod
 from app.services import (
     analysis_repo,
     connection_repo,
     evaluation_repo,
     experiment_repo,
 )
-
+from app.services import artifacts as artifact_store_mod
 
 router = APIRouter()
 
@@ -78,7 +77,9 @@ def create_experiment(
     # Store the original image now that we have an id.
     import io
 
-    path, stored_checksum, _size = store.store_original_image(experiment.id, ext, io.BytesIO(content))
+    path, stored_checksum, _size = store.store_original_image(
+        experiment.id, ext, io.BytesIO(content)
+    )
     if stored_checksum != checksum:
         experiment.original_checksum = stored_checksum
         db.commit()

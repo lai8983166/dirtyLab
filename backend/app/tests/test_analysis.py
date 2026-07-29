@@ -10,18 +10,16 @@ Scenarios:
 """
 from __future__ import annotations
 
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
 from app.core.config import AppConfig
 from app.core.errors import ValidationError
-from app.db.base import session_scope
 from app.db.bootstrap import ensure_seed_data
-from app.models import Analysis, Artifact, Experiment, Provider, Snapshot
+from app.models import Artifact, Experiment, Provider, Snapshot
 from app.providers import AnalysisResult
-from app.services import analysis_repo, connection_repo, experiment_repo, multimodal
+from app.services import analysis_repo, connection_repo, multimodal
 
 
 def _seed_experiment_with_artifact(db) -> tuple[str, str]:
@@ -115,7 +113,9 @@ def test_successful_analysis_stores_suggestions(db_session) -> None:
         },
     )
     with patch("app.services.multimodal.get_provider") as mocked:
-        adapter = type("A", (), {"kind": "openai_compatible", "analyze": lambda self, *a, **k: fake})()
+        adapter = type(
+            "A", (), {"kind": "openai_compatible", "analyze": lambda self, *a, **k: fake}
+        )()
         mocked.return_value = adapter
         analysis = multimodal.request_analysis(
             db_session,
@@ -176,7 +176,9 @@ def test_confirm_edited_suggestions_marks_confirmed(db_session) -> None:
         },
     )
     with patch("app.services.multimodal.get_provider") as mocked:
-        mocked.return_value = type("A", (), {"kind": "openai_compatible", "analyze": lambda self, *a, **k: fake})()
+        mocked.return_value = type(
+            "A", (), {"kind": "openai_compatible", "analyze": lambda self, *a, **k: fake}
+        )()
         analysis = multimodal.request_analysis(
             db_session,
             experiment=experiment,
@@ -212,7 +214,9 @@ def test_rejected_suggestions_do_not_become_confirmed(db_session) -> None:
         },
     )
     with patch("app.services.multimodal.get_provider") as mocked:
-        mocked.return_value = type("A", (), {"kind": "openai_compatible", "analyze": lambda self, *a, **k: fake})()
+        mocked.return_value = type(
+            "A", (), {"kind": "openai_compatible", "analyze": lambda self, *a, **k: fake}
+        )()
         analysis = multimodal.request_analysis(
             db_session,
             experiment=experiment,

@@ -9,7 +9,6 @@ from app.schemas import TemplateIn, TemplateOut
 from app.schemas.repositories import template_to_schema
 from app.services import template_repo
 
-
 router = APIRouter()
 
 

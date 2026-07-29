@@ -9,9 +9,8 @@ import pytest
 from app.core.config import AppConfig
 from app.db.base import init_engine, session_scope
 from app.db.bootstrap import create_schema, ensure_seed_data
-from app.models import Connection
-from app.schemas import SyncResultOut
-from app.services import connection_repo, experiment_repo, sync as sync_service
+from app.services import connection_repo, experiment_repo
+from app.services import sync as sync_service
 from app.tests._fixtures import PNG_1x1_RED as PNG
 from app.tests.sftp_fixture import install_fake_sftp
 
@@ -33,8 +32,8 @@ def seeded(tmp_data_dir: Path):
             private_key_ref="autodl_private_key",
             remote_root="/root/ComfyUI",
         )
-        from app.services.artifacts import sha256_bytes
         from app.models import Experiment
+        from app.services.artifacts import sha256_bytes
 
         experiment = Experiment(
             name="x",
@@ -110,7 +109,7 @@ def test_sync_partial_failure(seeded, monkeypatch) -> None:
 
     def flaky_getfo(path: str, stream: io.BytesIO) -> None:
         if path.endswith("c2.png"):
-            raise IOError("simulated network drop")
+            raise OSError("simulated network drop")
         original_getfo(path, stream)
 
     fake.getfo = flaky_getfo
@@ -145,7 +144,6 @@ def test_sync_creates_new_snapshot_each_run(seeded, monkeypatch) -> None:
 
 def test_sync_empty_workspace(seeded, monkeypatch) -> None:
     cfg, experiment_id = seeded
-    workspace = "/root/ComfyUI/experiments/abc"
     # No files registered at all -> listdir(workspace) raises FileNotFoundError
     # -> sync returns empty.
     install_fake_sftp(monkeypatch, {})

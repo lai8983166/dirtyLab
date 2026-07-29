@@ -14,7 +14,6 @@ from app.api import (
     sync,
 )
 
-
 router = APIRouter()
 router.include_router(connections.router, prefix="/connections", tags=["connections"])
 router.include_router(providers.router, prefix="/providers", tags=["providers"])

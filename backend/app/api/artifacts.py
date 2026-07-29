@@ -8,13 +8,11 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from app.core.config import get_config
 from app.core.errors import NotFoundError
 from app.db.base import get_db
 from app.schemas import ArtifactOut, MetadataCorrectionIn
 from app.schemas.repositories import artifact_to_schema
 from app.services import experiment_repo
-
 
 router = APIRouter()
 

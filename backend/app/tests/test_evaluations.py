@@ -11,15 +11,11 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from app.db.base import session_scope
 from app.db.bootstrap import ensure_seed_data
 from app.models import (
     Artifact,
     Evaluation,
     Experiment,
-    FailureTag,
-    QualityDimension,
-    ScoringTemplate,
     Snapshot,
 )
 from app.services import evaluation_repo, template_repo
