@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { api } from "../api/client";
-import type { Analysis } from "../api/types";
+import type { Analysis, Artifact } from "../api/types";
 
-interface Props {
+type Props = {
   experimentId: string;
+  candidates: Artifact[];
   analyses: Analysis[];
   onChanged: () => void;
-}
+};
 
-export function AnalysisPanel({ experimentId, analyses, onChanged }: Props) {
+export function AnalysisPanel({ experimentId, candidates, analyses, onChanged }: Props) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [goalOverride, setGoalOverride] = useState("");
   const [includeComparison, setIncludeComparison] = useState(false);
@@ -42,28 +43,74 @@ export function AnalysisPanel({ experimentId, analyses, onChanged }: Props) {
   return (
     <div>
       <p className="muted">
-        选中候选图后点击请求。同步时绝不会触发 AI 调用——只有这个按钮会。
+        选择一张或多张候选图，让模型根据目标、元数据和结果给出可编辑的建议。
       </p>
-      <button onClick={request} disabled={busy}>
-        {busy ? "请求中…" : "请求 AI 分析"}
-      </button>
-      <label>
-        <input
-          type="checkbox"
-          checked={includeComparison}
-          onChange={(e) => setIncludeComparison(e.target.checked)}
-        />{" "}
-        包含对比上下文（同实验下其它已确认评分）
-      </label>
-      <label>
-        目标覆盖（可选）
-        <input value={goalOverride} onChange={(e) => setGoalOverride(e.target.value)} />
-      </label>
+      {candidates.length > 0 ? (
+        <div className="analysis-picker" aria-label="选择要分析的候选图">
+          {candidates.map((candidate, index) => {
+            const selected = selectedIds.has(candidate.id);
+            return (
+              <button
+                className={`candidate-select ${selected ? "selected" : ""}`}
+                key={candidate.id}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => {
+                  const next = new Set(selectedIds);
+                  if (selected) next.delete(candidate.id);
+                  else next.add(candidate.id);
+                  setSelectedIds(next);
+                }}
+              >
+                <img
+                  src={`/api/artifacts/${candidate.id}/file`}
+                  alt={`候选图 ${index + 1}`}
+                />
+                <span className="candidate-select-copy">
+                  <strong>候选图 {index + 1}</strong>
+                  <small>{candidate.relative_path}</small>
+                </span>
+                <span className="selection-check" aria-hidden="true">
+                  {selected ? "✓" : ""}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="empty-state compact">
+          <span className="empty-icon" aria-hidden="true">✦</span>
+          <span>同步候选图后，可以在这里请求 AI 分析。</span>
+        </div>
+      )}
+
+      <div className="analysis-toolbar">
+        <span className="selection-count">
+          已选择 <strong>{selectedIds.size}</strong> / {candidates.length} 张
+        </span>
+        <button onClick={request} disabled={busy || selectedIds.size === 0}>
+          {busy ? "请求中…" : "请求 AI 分析"}
+        </button>
+      </div>
+      <div className="analysis-options">
+        <label className="toggle-label">
+          <input
+            type="checkbox"
+            checked={includeComparison}
+            onChange={(e) => setIncludeComparison(e.target.checked)}
+          />
+          <span>带入其它已确认评分作为对比上下文</span>
+        </label>
+        <label>
+          目标覆盖（可选）
+          <input value={goalOverride} onChange={(e) => setGoalOverride(e.target.value)} />
+        </label>
+      </div>
       {err && <p className="error">{err}</p>}
 
       <ul className="list">
         {analyses.map((a) => (
-          <li key={a.id}>
+          <li className="analysis-item" key={a.id}>
             <strong>
               {a.provider_kind} · {a.provider_model}
             </strong>
@@ -83,14 +130,17 @@ export function AnalysisPanel({ experimentId, analyses, onChanged }: Props) {
 }
 
 function AnalysisDetail({ analysis, onChanged }: { analysis: Analysis; onChanged: () => void }) {
-  const suggestions = analysis.suggestions as Record<string, any>;
-  const [edited, setEdited] = useState({
+  const suggestions = analysis.suggestions;
+  const [edited, setEdited] = useState<{
+    overall_score: number | "";
+    status: NonNullable<Analysis["suggestions"]["status"]>;
+    notes: string;
+    rejected: string[];
+  }>({
     overall_score: suggestions.overall_score ?? "",
     status: suggestions.status ?? "failure",
-    notes: Array.isArray(suggestions.failure_causes)
-      ? suggestions.failure_causes.join("\n")
-      : "",
-    rejected: [] as string[],
+    notes: suggestions.failure_causes?.join("\n") ?? "",
+    rejected: [],
   });
   const [confirmed, setConfirmed] = useState(analysis.is_confirmed);
   const [rejectedOnly, setRejectedOnly] = useState(analysis.is_rejected);
@@ -130,7 +180,7 @@ function AnalysisDetail({ analysis, onChanged }: { analysis: Analysis; onChanged
       <div className="muted">
         建议的失败原因：
         <ul>
-          {(suggestions.failure_causes || []).map((c: string, i: number) => (
+          {(suggestions.failure_causes || []).map((c, i) => (
             <li key={i}>
               <label>
                 <input
@@ -164,7 +214,12 @@ function AnalysisDetail({ analysis, onChanged }: { analysis: Analysis; onChanged
           结果
           <select
             value={edited.status}
-            onChange={(e) => setEdited({ ...edited, status: e.target.value })}
+            onChange={(e) =>
+              setEdited({
+                ...edited,
+                status: e.target.value as NonNullable<Analysis["suggestions"]["status"]>,
+              })
+            }
           >
             <option value="success">成功</option>
             <option value="partial_success">部分成功</option>

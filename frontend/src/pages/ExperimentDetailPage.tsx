@@ -131,13 +131,18 @@ export function ExperimentDetailPage() {
         {candidates.length === 0 ? (
           <p className="muted">还没有候选图。同步一个快照后这里会显示。</p>
         ) : (
-          <CandidateComparison artifacts={candidates} experimentId={detail.id} onChange={load} />
+          <CandidateComparison artifacts={candidates} onChange={load} />
         )}
       </div>
 
       <div className="card span-2">
         <h2>AI 分析历史</h2>
-        <AnalysisPanel experimentId={detail.id} analyses={detail.analyses} onChanged={load} />
+        <AnalysisPanel
+          experimentId={detail.id}
+          candidates={candidates}
+          analyses={detail.analyses}
+          onChanged={load}
+        />
       </div>
 
       {err && <p className="error">{err}</p>}

@@ -5,11 +5,10 @@ import { CandidateCard } from "./CandidateCard";
 
 interface Props {
   artifacts: Artifact[];
-  experimentId: string;
   onChange: () => void;
 }
 
-export function CandidateComparison({ artifacts, experimentId, onChange }: Props) {
+export function CandidateComparison({ artifacts, onChange }: Props) {
   const [template, setTemplate] = useState<Template | null>(null);
   useEffect(() => {
     api.get<Template>("/scoring").then(setTemplate).catch(() => setTemplate(null));
@@ -25,7 +24,6 @@ export function CandidateComparison({ artifacts, experimentId, onChange }: Props
           <CandidateCard
             key={a.id}
             artifact={a}
-            experimentId={experimentId}
             template={template}
             onChanged={onChange}
           />

@@ -4,12 +4,11 @@ import type { Artifact, Evaluation, Template } from "../api/types";
 
 interface Props {
   artifact: Artifact;
-  experimentId: string;
   template: Template | null;
   onChanged: () => void;
 }
 
-export function CandidateCard({ artifact, experimentId, template, onChanged }: Props) {
+export function CandidateCard({ artifact, template, onChanged }: Props) {
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [status, setStatus] = useState<Evaluation["status"]>("failure");
   const [overall, setOverall] = useState<number | "">("");

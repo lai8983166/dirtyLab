@@ -129,7 +129,7 @@ export interface Analysis {
   provider_model: string;
   status: "pending" | "success" | "failed";
   error_detail: string | null;
-  suggestions: Record<string, unknown>;
+  suggestions: AnalysisSuggestions;
   is_confirmed: boolean;
   is_rejected: boolean;
   confirmed_overall_score: number | null;
@@ -138,6 +138,14 @@ export interface Analysis {
   requested_at: string;
   completed_at: string | null;
   confirmed_at: string | null;
+}
+
+export interface AnalysisSuggestions {
+  failure_causes?: string[];
+  quality_scores?: Record<string, number>;
+  overall_score?: number | null;
+  status?: Evaluation["status"];
+  next_steps?: string[];
 }
 
 export interface SyncResult {
