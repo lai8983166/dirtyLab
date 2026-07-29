@@ -3,6 +3,8 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "packageManager": "pnpm@10.4.0",
+  "engines": { "node": ">=20" },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -31,5 +33,8 @@
     "@testing-library/react": "^15.0.7",
     "@testing-library/jest-dom": "^6.4.5",
     "jsdom": "^24.1.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
   }
 }

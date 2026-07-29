@@ -5,7 +5,9 @@ ComfyUI experiments running on an AutoDL instance.
 
 ## 1. Install
 
-Requirements: Python 3.11+ and Node 18+.
+Requirements: [uv](https://docs.astral.sh/uv/) (Python toolchain) and Node 20+
+with pnpm enabled via Corepack (`corepack enable`). uv downloads and manages
+its own Python — you do not need a system Python install.
 
 ```bash
 git clone <this repo>
@@ -13,8 +15,8 @@ cd dirtyLab
 make install
 ```
 
-This creates a Python venv, installs the backend as an editable package, and
-installs the frontend dependencies.
+This runs `uv sync` in `backend/` (creating `backend/.venv/` and installing the
+backend with its dev dependencies) and `pnpm install` in `frontend/`.
 
 ## 2. First run
 

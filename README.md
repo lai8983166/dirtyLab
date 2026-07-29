@@ -17,11 +17,14 @@ See [docs/setup.md](docs/setup.md) for first-run setup and
 
 ## Quick start
 
+Prerequisites: install [uv](https://docs.astral.sh/uv/) (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
+and enable pnpm (`corepack enable`). uv manages Python for you — no system Python needed.
+
 ```bash
 # from repo root
-make install        # create venv, install backend + frontend deps
+make install        # uv sync (backend) + pnpm install (frontend)
 make dev            # run backend (8000) and frontend (5173) together
-make test           # run pytest + frontend typecheck/tests
+make test           # run pytest + vitest
 make lint           # ruff + mypy + eslint
 ```
 

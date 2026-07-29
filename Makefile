@@ -1,52 +1,45 @@
 .PHONY: install dev backend frontend test test-backend test-frontend lint lint-backend lint-frontend typecheck preflight check clean
 
-PYTHON ?= python3
-VENV ?= $(CURDIR)/.venv
-PIP=$(VENV)/bin/pip
-PY=$(VENV)/bin/python
-
 install: install-backend install-frontend
 
 install-backend:
-	[ -d $(VENV) ] || $(PYTHON) -m venv $(VENV)
-	$(PIP) install --upgrade pip wheel
-	$(PIP) install -e "backend[dev]"
+	cd backend && uv sync
 
 install-frontend:
-	cd frontend && npm install
+	pnpm install --dir frontend
 
 dev:
 	$(MAKE) -j 2 backend frontend
 
 backend:
-	$(PY) -m uvicorn app.main:app --reload --app-dir backend --port 8000
+	cd backend && uv run uvicorn app.main:app --reload --port 8000
 
 frontend:
-	cd frontend && npm run dev
+	pnpm --dir frontend run dev
 
 test: test-backend test-frontend
 
 preflight:
-	python3 scripts/preflight.py
+	uv run --project backend python scripts/preflight.py
 
 check: preflight test
 
 test-backend:
-	cd backend && $(PY) -m pytest -q
+	cd backend && uv run pytest -q
 
 test-frontend:
-	cd frontend && npm run test -- --run
+	pnpm --dir frontend run test --run
 
 typecheck:
-	cd frontend && npm run typecheck
+	pnpm --dir frontend run typecheck
 
 lint: lint-backend lint-frontend
 
 lint-backend:
-	cd backend && $(PY) -m ruff check app && $(PY) -m mypy app
+	cd backend && uv run ruff check app && uv run mypy app
 
 lint-frontend:
-	cd frontend && npm run lint
+	pnpm --dir frontend run lint
 
 clean:
-	rm -rf $(VENV) frontend/node_modules data
+	rm -rf backend/.venv frontend/node_modules data

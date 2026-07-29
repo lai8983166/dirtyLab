@@ -21,16 +21,6 @@ dependencies = [
   "alembic>=1.13",
 ]
 
-[project.optional-dependencies]
-dev = [
-  "pytest>=8.0",
-  "pytest-asyncio>=0.23",
-  "pytest-cov>=4.1",
-  "ruff>=0.3",
-  "mypy>=1.9",
-  "types-paramiko",
-]
-
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["app*"]
@@ -56,3 +46,13 @@ python_version = "3.11"
 strict = false
 ignore_missing_imports = true
 exclude = ["app/tests"]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+  "pytest-cov>=4.1",
+  "ruff>=0.3",
+  "mypy>=1.9",
+  "types-paramiko",
+]
